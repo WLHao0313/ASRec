@@ -518,12 +518,8 @@ class MultiHeadAttention(nn.Module):
         context_layer = context_layer.transpose(1, 2).contiguous()
 
         small_scale = self.conv_small(context_layer)
-        middle_scale = self.conv_middle(context_layer)
         large_scale = self.conv_large(context_layer)
-        small_AHFF=self.AHFF(small_scale)+small_scale
-        middle_AHFF=self.AHFF(middle_scale)+middle_scale
-        large_AHFF=self.AHFF(large_scale)+large_scale
-        context_layer = self.contra_scale1 * small_AHFF + self.contra_scale2 * large_AHFF + self.contra_scale3 * middle_AHFF
+        context_layer = self.contra_scale1 * small_AHFF + self.contra_scale2 * large_AHFF
 
         context_layer = context_layer.view(*context_layer.size()[:-1], -1)
 
@@ -697,9 +693,9 @@ class TransformerLayer(nn.Module):
         self.v3 = nn.Parameter(torch.tensor(0.5))
 
     def forward(self, hidden_states, attention_mask):
-        #AFF_output1 = self.AHFF(hidden_states)
+        AFF_output1 = self.AHFF(hidden_states)
         season_output = self.multi_head_attention(hidden_states, attention_mask)
-        #AFF_output1 = self.AHFF(hidden_states)
+        AFF_output1 = self.AHFF(hidden_states)
         attention_output = self.multi_head_attention1(hidden_states, attention_mask)
 
         attention_output = self.v3 * attention_output + (1-self.v3)*season_output
