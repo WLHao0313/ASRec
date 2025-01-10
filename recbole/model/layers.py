@@ -694,9 +694,9 @@ class TransformerLayer(nn.Module):
 
     def forward(self, hidden_states, attention_mask):
         AFF_output1 = self.AHFF(hidden_states)
-        season_output = self.multi_head_attention(hidden_states, attention_mask)
+        season_output = self.multi_head_attention(AFF_output1, attention_mask)
         AFF_output1 = self.AHFF(hidden_states)
-        attention_output = self.multi_head_attention1(hidden_states, attention_mask)
+        attention_output = self.multi_head_attention1(AFF_output1, attention_mask)
 
         attention_output = self.v3 * attention_output + (1-self.v3)*season_output
 
