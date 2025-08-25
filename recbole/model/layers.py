@@ -690,16 +690,13 @@ class TransformerLayer(nn.Module):
         self.multi_head_attention1 = MultiHeadAttention1(
             n_heads, hidden_size, hidden_dropout_prob, attn_dropout_prob, layer_norm_eps, max_seq_length
         )
-        self.AHFF = AHFF(hidden_size, layer_norm_eps)
         self.out_dropout = nn.Dropout(hidden_dropout_prob)
         self.LayerNorm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
         self.feed_forward = FeedForward(hidden_size, intermediate_size, hidden_dropout_prob, hidden_act, layer_norm_eps)
         self.v3 = nn.Parameter(torch.tensor(0.5))
 
     def forward(self, hidden_states, attention_mask):
-        #AFF_output1 = self.AHFF(hidden_states)
         season_output = self.multi_head_attention(hidden_states, attention_mask)
-        #AFF_output1 = self.AHFF(hidden_states)
         attention_output = self.multi_head_attention1(hidden_states, attention_mask)
 
         attention_output = self.v3 * attention_output + (1-self.v3)*season_output
